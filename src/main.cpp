@@ -11,8 +11,7 @@
 #define CHARACTERISTIC_UUID "676e0287-815e-4f6f-b18a-64bcae972e90"
 
 int threshold = 3000;
-
-int inPin = A2;
+int inPin = A2; //Use with 10k ohm resistor
 double startTime = 1;
 double endTime = 1;
 double testTime = 1;
