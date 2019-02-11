@@ -18,6 +18,8 @@ double endTime = 1;
 double testTime = 1;
 bool flag = false;
 
+double lapTimes[250]; // Empty set of laptimes
+
 double lapTime = 1;
 BLEServer *pServer;
 BLECharacteristic *pCharacteristic;
