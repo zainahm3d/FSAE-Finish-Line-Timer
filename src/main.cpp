@@ -11,12 +11,13 @@
 #define CHARACTERISTIC_UUID "676e0287-815e-4f6f-b18a-64bcae972e90"
 
 int threshold = 3000;
-int inPin = A2; //Use with 10k ohm resistor
+int inPin = A2; // Use with 10k ohm resistor
 double startTime = 1;
 double endTime = 1;
 double testTime = 1;
 bool flag = false;
 
+int arrCounter = 0;   // keeps track of array position. reset on boot
 double lapTimes[250]; // Empty set of laptimes
 
 double lapTime = 1;
@@ -24,14 +25,17 @@ BLEServer *pServer;
 BLECharacteristic *pCharacteristic;
 
 void setup() {
+
+  for (int i = 0; i < 250; i++) { // added for safety
+    lapTimes[i] = 0.00;
+  }
+
   BLEDevice::init("FSAE Gate Timer");
   delay(200);
   Serial.begin(9600);
 
   delay(100);
-  for (int i = 0; i < 100; i++) {
-    Serial.println();
-  }
+
   Serial.println("Initialization complete");
 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -73,7 +77,15 @@ void gateTripped() {
   if ((testTime > 6) && (flag == true)) {
     lapTime = testTime;
     Serial.println(lapTime);
-    uploadTime(lapTime);
+
+    lapTimes[arrCounter] = lapTime;
+    arrCounter++;
+
+    for (int i = 0; i < arrCounter; i++) {
+      uploadTime(lapTimes[i]);
+    }
+
+    uploadTime(0.00); // Tells iPhone that the data list has finished sending
   }
 }
 
