@@ -24,6 +24,15 @@ double lapTime = 1;
 BLEServer *pServer;
 BLECharacteristic *pCharacteristic;
 
+// Sends data over BLE and notifies central device
+void uploadTime(double time) {
+  char valToSend[10] = "";
+  String(time, DEC).toCharArray(valToSend, 10);
+  pCharacteristic->setValue(valToSend);
+  pCharacteristic->notify();
+  Serial.println("time uploaded");
+}
+
 void setup() {
 
   for (int i = 0; i < 250; i++) { // added for safety
@@ -60,14 +69,6 @@ void setup() {
   pAdvertising->start();
 }
 
-// Sends data over BLE and notifies central device
-void uploadTime(double time) {
-  char valToSend[10] = "";
-  String(time, DEC).toCharArray(valToSend, 10);
-  pCharacteristic->setValue(valToSend);
-  pCharacteristic->notify();
-}
-
 void gateTripped() {
   flag = true;
   endTime = millis();
@@ -102,5 +103,26 @@ void loop() {
     digitalWrite(LED_BUILTIN, LOW);
     gateTripped();
     delay(3000);
+  }
+
+  // reset onboard data if command is sent from iPhone
+  if (pCharacteristic->getValue() == "clear") {
+    for (int i = 0; i < 250; i++) { // added for safety
+      lapTimes[i] = 0.00;
+    }
+    arrCounter = 0;
+    uploadTime(0.00);
+    Serial.println("data cleared");
+  }
+
+  // send data request to iPhone
+  if (pCharacteristic->getValue() == "request") {
+    Serial.println("data requested");
+
+    for (int i = 0; i < arrCounter; i++) {
+      uploadTime(lapTimes[i]);
+    }
+
+    uploadTime(0.00); // Tells iPhone that the data list has finished sending
   }
 }
