@@ -40,6 +40,7 @@ void setup() {
   }
 
   BLEDevice::init("FSAE Gate Timer");
+  BLEDevice::setPower(ESP_PWR_LVL_P7);
   delay(200);
   Serial.begin(9600);
 
